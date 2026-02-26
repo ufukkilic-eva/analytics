@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { X, Plus, Check, Edit2, Trash2, Tag, Info, ChevronRight, Settings2, Search, Columns } from 'lucide-react';
+import { X, Plus, Check, Edit2, Trash2, Tag, Info, ChevronRight, Settings2, Search, Columns, TrendingUp, TrendingDown } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const INITIAL_TAGS = {
@@ -1230,6 +1230,127 @@ export function ProductTable({
     }
   };
 
+  const getDeterministicHash = (input: string) => {
+    let hash = 0;
+    for (let i = 0; i < input.length; i += 1) {
+      hash = (hash * 31 + input.charCodeAt(i)) >>> 0;
+    }
+    return hash;
+  };
+
+  const parseDisplayValue = (value: string | number | null) => {
+    if (value === null || value === undefined) return null;
+
+    if (typeof value === 'number') {
+      return {
+        numericValue: value,
+        kind: 'number' as const,
+        decimals: Number.isInteger(value) ? 0 : 2,
+      };
+    }
+
+    const trimmed = String(value).trim();
+    if (!trimmed || trimmed === '-') return null;
+
+    const numericValue = Number.parseFloat(trimmed.replace(/[^0-9.-]/g, ''));
+    if (!Number.isFinite(numericValue)) return null;
+
+    const decimalMatch = trimmed.match(/\.([0-9]+)/);
+    return {
+      numericValue,
+      kind: trimmed.includes('$') ? ('currency' as const) : trimmed.endsWith('%') ? ('percent' as const) : ('number-string' as const),
+      decimals: decimalMatch?.[1]?.length ?? 0,
+    };
+  };
+
+  const formatParsedValue = (
+    numericValue: number,
+    parsed: { kind: 'number' | 'number-string' | 'currency' | 'percent'; decimals: number }
+  ) => {
+    const decimals = Math.max(0, Math.min(parsed.decimals, 4));
+    const absValue = Math.abs(numericValue);
+
+    if (parsed.kind === 'currency') {
+      return `${numericValue < 0 ? '-' : ''}$${absValue.toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })}`;
+    }
+
+    if (parsed.kind === 'percent') {
+      return `${numericValue.toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })}%`;
+    }
+
+    return numericValue.toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+  };
+
+  const getPeriodComparison = (productId: number, columnId: string, rawValue: string | number | null) => {
+    const parsed = parseDisplayValue(rawValue);
+    if (!parsed) return null;
+
+    const hash = getDeterministicHash(`${productId}-${columnId}`);
+    const isPositive = hash % 2 === 0;
+    const changePercent = 2 + ((hash % 130) / 10); // 2.0% - 14.9%
+    const factor = isPositive ? (1 + changePercent / 100) : (1 - changePercent / 100);
+    const previousNumericValue = factor <= 0 ? parsed.numericValue : parsed.numericValue / factor;
+
+    return {
+      isPositive,
+      changePercent,
+      previousDisplayValue: formatParsedValue(previousNumericValue, parsed),
+    };
+  };
+
+  const renderCellWithPeriodMeta = (
+    productId: number,
+    columnId: string,
+    rawValue: string | number | null,
+    align: 'left' | 'center' | 'right',
+    currentContent: React.ReactNode
+  ) => {
+    const comparison = getPeriodComparison(productId, columnId, rawValue);
+
+    if (!comparison) {
+      return currentContent;
+    }
+
+    const alignmentClass =
+      align === 'right' ? 'items-end text-right' : align === 'center' ? 'items-center text-center' : 'items-start text-left';
+
+    return (
+      <div className={`flex items-start gap-2 ${align === 'right' ? 'justify-end' : align === 'center' ? 'justify-center' : 'justify-between'}`}>
+        <div className={`flex min-w-0 flex-col ${alignmentClass}`}>
+          {currentContent}
+          <span
+            className="text-[10px] leading-tight"
+            style={{ color: 'var(--text-primary)', opacity: 0.62 }}
+          >
+            {comparison.previousDisplayValue}
+          </span>
+        </div>
+        <div className="flex shrink-0 flex-col items-center leading-none">
+          {comparison.isPositive ? (
+            <TrendingUp className="w-3.5 h-3.5" style={{ color: '#22c55e' }} />
+          ) : (
+            <TrendingDown className="w-3.5 h-3.5" style={{ color: '#ef4444' }} />
+          )}
+          <span
+            className="mt-1 text-[10px] font-medium"
+            style={{ color: comparison.isPositive ? '#22c55e' : '#ef4444' }}
+          >
+            {comparison.changePercent.toFixed(1)}%
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <React.Fragment>
       <div className="relative">
@@ -1412,35 +1533,47 @@ export function ProductTable({
                             </div>
                           </div>
                         ) : col.id === 'productScore' ? (
-                          <div className="relative inline-flex items-center justify-center">
-                            <span className="text-[14px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-                              {score}
-                            </span>
-                            <span className="absolute -top-4 -right-7 inline-flex items-center justify-center cursor-pointer">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div style={{ cursor: 'pointer', lineHeight: 0 }}>
-                                      {getScoreLabel() === 'APS' ? (
-                                        <img src="/amazon.png" alt="Amazon" width="18" height="18" style={{ borderRadius: '4px', display: 'block' }} />
-                                      ) : getScoreLabel() === 'SPS' ? (
-                                        <img src="/shopify.png" alt="Shopify" width="18" height="18" style={{ borderRadius: '4px', display: 'block' }} />
-                                      ) : (
-                                        <img src="/eva.png" alt="Eva" width="18" height="18" style={{ borderRadius: '4px', display: 'block' }} />
-                                      )}
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top">
-                                    <p>{getScoreLabel() === 'APS' ? 'Amazon Performance Score' : getScoreLabel() === 'SPS' ? 'Shopify Performance Score' : 'Eva Performance Score'}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </span>
-                          </div>
+                          renderCellWithPeriodMeta(
+                            product.id,
+                            col.id,
+                            score,
+                            'center',
+                            <div className="relative inline-flex items-center justify-center">
+                              <span className="text-[14px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                {score}
+                              </span>
+                              <span className="absolute -top-4 -right-7 inline-flex items-center justify-center cursor-pointer">
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div style={{ cursor: 'pointer', lineHeight: 0 }}>
+                                        {getScoreLabel() === 'APS' ? (
+                                          <img src="/amazon.png" alt="Amazon" width="18" height="18" style={{ borderRadius: '4px', display: 'block' }} />
+                                        ) : getScoreLabel() === 'SPS' ? (
+                                          <img src="/shopify.png" alt="Shopify" width="18" height="18" style={{ borderRadius: '4px', display: 'block' }} />
+                                        ) : (
+                                          <img src="/eva.png" alt="Eva" width="18" height="18" style={{ borderRadius: '4px', display: 'block' }} />
+                                        )}
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">
+                                      <p>{getScoreLabel() === 'APS' ? 'Amazon Performance Score' : getScoreLabel() === 'SPS' ? 'Shopify Performance Score' : 'Eva Performance Score'}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </span>
+                            </div>
+                          )
                         ) : (
-                          <div className="text-[13px]" style={{ color: 'var(--text-primary)' }}>
-                            {renderCellContent(product, col.id)}
-                          </div>
+                          renderCellWithPeriodMeta(
+                            product.id,
+                            col.id,
+                            renderCellContent(product, col.id) as string | number | null,
+                            col.align,
+                            <div className="text-[13px]" style={{ color: 'var(--text-primary)' }}>
+                              {renderCellContent(product, col.id)}
+                            </div>
+                          )
                         )}
                       </td>
                     ))}
