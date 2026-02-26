@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Store, ChevronDown, Check } from 'lucide-react';
 
 type Channel = 'amazon' | 'shopify' | 'walmart';
-type AccountType = 'seller' | 'vendor';
+type AccountType = 'seller' | 'vendor' | 'both' | 'none';
 type Store = 'all' | 'Karaca Porcelain - US' | 'KARACA - UK' | 'KARACA - DE';
 
 interface ChannelHeaderProps {
@@ -71,6 +71,31 @@ export function ChannelHeader({
         return `${selectedStores.length} Stores`;
     }, [selectedStores]);
 
+    const sellerSelected = accountType === 'seller' || accountType === 'both';
+    const vendorSelected = accountType === 'vendor' || accountType === 'both';
+
+    const handleAccountTypeToggle = (type: 'seller' | 'vendor') => {
+        const nextSellerSelected = type === 'seller' ? !sellerSelected : sellerSelected;
+        const nextVendorSelected = type === 'vendor' ? !vendorSelected : vendorSelected;
+
+        if (nextSellerSelected && nextVendorSelected) {
+            onAccountTypeChange('both');
+            return;
+        }
+
+        if (nextSellerSelected) {
+            onAccountTypeChange('seller');
+            return;
+        }
+
+        if (nextVendorSelected) {
+            onAccountTypeChange('vendor');
+            return;
+        }
+
+        onAccountTypeChange('none');
+    };
+
     return (
         <div
             className="h-14 flex items-center justify-between px-6 mb-6 rounded-lg"
@@ -132,23 +157,43 @@ export function ChannelHeader({
                     style={{ background: 'var(--bg-secondary)' }}
                 >
                     <button
-                        onClick={() => onAccountTypeChange('seller')}
-                        className="h-8 px-4 text-xs font-medium rounded-md transition-all"
+                        onClick={() => handleAccountTypeToggle('seller')}
+                        className="h-8 px-3 text-xs font-medium rounded-md transition-all flex items-center gap-1.5"
                         style={{
-                            background: accountType === 'seller' ? 'var(--brand-purple)' : 'transparent',
-                            color: accountType === 'seller' ? '#fff' : 'var(--text-secondary)',
+                            background: sellerSelected ? 'var(--brand-purple)' : 'transparent',
+                            color: sellerSelected ? '#fff' : 'var(--text-secondary)',
                         }}
                     >
+                        <div className="w-3 h-3 rounded-sm border flex items-center justify-center"
+                            style={{
+                                borderColor: sellerSelected ? '#fff' : 'currentColor',
+                                background: sellerSelected ? '#fff' : 'transparent'
+                            }}
+                        >
+                            {sellerSelected && (
+                                <Check size={10} style={{ color: 'var(--brand-purple)' }} />
+                            )}
+                        </div>
                         Seller
                     </button>
                     <button
-                        onClick={() => onAccountTypeChange('vendor')}
-                        className="h-8 px-4 text-xs font-medium rounded-md transition-all"
+                        onClick={() => handleAccountTypeToggle('vendor')}
+                        className="h-8 px-3 text-xs font-medium rounded-md transition-all flex items-center gap-1.5"
                         style={{
-                            background: accountType === 'vendor' ? 'var(--brand-purple)' : 'transparent',
-                            color: accountType === 'vendor' ? '#fff' : 'var(--text-secondary)',
+                            background: vendorSelected ? 'var(--brand-purple)' : 'transparent',
+                            color: vendorSelected ? '#fff' : 'var(--text-secondary)',
                         }}
                     >
+                        <div className="w-3 h-3 rounded-sm border flex items-center justify-center"
+                            style={{
+                                borderColor: vendorSelected ? '#fff' : 'currentColor',
+                                background: vendorSelected ? '#fff' : 'transparent'
+                            }}
+                        >
+                            {vendorSelected && (
+                                <Check size={10} style={{ color: 'var(--brand-purple)' }} />
+                            )}
+                        </div>
                         Vendor
                     </button>
                 </div>
@@ -219,14 +264,22 @@ export function ChannelHeader({
                 </div>
             </div>
 
-            {/* Right side - Export & Columns buttons */}
-            <div className="flex items-center gap-3">
+            {/* Right side - Export button */}
+            <div className="flex items-center gap-3 flex-shrink-0">
                 <button
-                    className="h-10 px-4 rounded-lg flex items-center gap-2 text-sm font-medium transition-all"
+                    className="h-10 px-4 rounded-lg flex items-center gap-2 text-sm font-medium transition-all hover:border-gray-500"
                     style={{
                         background: 'var(--bg-primary)',
                         border: '1px solid var(--card-border)',
                         color: 'var(--text-secondary)',
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--bg-secondary)';
+                        e.currentTarget.style.color = 'var(--text-primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'var(--bg-primary)';
+                        e.currentTarget.style.color = 'var(--text-secondary)';
                     }}
                 >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -235,22 +288,6 @@ export function ChannelHeader({
                         <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
                     Export
-                </button>
-                <button
-                    className="h-10 px-4 rounded-lg flex items-center gap-2 text-sm font-medium transition-all"
-                    style={{
-                        background: 'var(--bg-primary)',
-                        border: '1px solid var(--card-border)',
-                        color: 'var(--text-secondary)',
-                    }}
-                >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="3" width="7" height="7" />
-                        <rect x="14" y="3" width="7" height="7" />
-                        <rect x="14" y="14" width="7" height="7" />
-                        <rect x="3" y="14" width="7" height="7" />
-                    </svg>
-                    Columns
                 </button>
             </div>
         </div>

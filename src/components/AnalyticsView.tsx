@@ -8,12 +8,12 @@ import { ChannelHeader } from './ChannelHeader';
 import { ComposedChart, Line, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 type Channel = 'amazon' | 'shopify' | 'walmart';
-type AccountType = 'seller' | 'vendor';
+type AccountType = 'seller' | 'vendor' | 'both' | 'none';
 
 type ViewMode = 'product' | 'campaign';
 type TimeRange = 'daily' | 'weekly' | 'monthly';
 type TableViewMode = 'table' | 'cards';
-type GroupBy = 'brand' | 'tag' | 'parent-asin' | 'asin' | 'sku';
+type GroupBy = 'brand' | 'tag' | 'parent-asin' | 'asin';
 
 interface MetricState {
   id: string;
@@ -32,6 +32,7 @@ export function AnalyticsView() {
   const [groupBy, setGroupBy] = useState<GroupBy>('brand');
   const [selectedChannels, setSelectedChannels] = useState<Channel[]>(['amazon']);
   const [accountType, setAccountType] = useState<AccountType>('seller');
+
   const [metrics, setMetrics] = useState<MetricState[]>([
     {
       id: 'impressions',
@@ -430,7 +431,7 @@ export function AnalyticsView() {
               className="inline-flex rounded-lg p-1"
               style={{ background: 'var(--bg-secondary)' }}
             >
-              {(['brand', 'tag', 'parent-asin', 'asin', 'sku'] as GroupBy[]).map((option) => (
+              {(['brand', 'tag', 'parent-asin', 'asin'] as GroupBy[]).map((option) => (
                 <button
                   key={option}
                   onClick={() => setGroupBy(option)}
@@ -443,8 +444,7 @@ export function AnalyticsView() {
                   {option === 'brand' ? 'Brand' :
                     option === 'tag' ? 'Tag' :
                       option === 'parent-asin' ? 'Parent Asin' :
-                        option === 'asin' ? 'Asin' :
-                          option === 'sku' ? 'Sku' : option}
+                        option === 'asin' ? 'Asin' : option}
                 </button>
               ))}
             </div>
@@ -458,32 +458,32 @@ export function AnalyticsView() {
             border: '1px solid var(--card-border)'
           }}
         >
-          <div className="mb-6">
-            <h3
-              className="text-lg font-semibold"
-              style={{ color: 'var(--text-primary)' }}
+          {accountType === 'none' ? (
+            <div
+              className="rounded-lg p-8 text-center"
+              style={{
+                background: 'var(--bg-secondary)',
+                border: '1px dashed var(--card-border)'
+              }}
             >
-              Product List
-            </h3>
-            <p
-              className="text-sm mt-1"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              Manage product tags and classifications
-            </p>
-          </div>
-
-          <ProductTable
-            selectedStore={
-              selectedChannels.length === 2 && selectedChannels.includes('amazon') && selectedChannels.includes('shopify')
-                ? 'both'
-                : selectedChannels.includes('amazon')
-                  ? 'amazon'
-                  : selectedChannels.includes('shopify')
-                    ? 'shopify'
-                    : 'both'
-            }
-          />
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                Table&apos;ı görmek için Seller ve/veya Vendor seçin.
+              </p>
+            </div>
+          ) : (
+            <ProductTable
+              selectedStore={
+                selectedChannels.length === 2 && selectedChannels.includes('amazon') && selectedChannels.includes('shopify')
+                  ? 'both'
+                  : selectedChannels.includes('amazon')
+                    ? 'amazon'
+                    : selectedChannels.includes('shopify')
+                      ? 'shopify'
+                      : 'both'
+              }
+              mode={accountType}
+            />
+          )}
         </div>
       </div>
     </div>
