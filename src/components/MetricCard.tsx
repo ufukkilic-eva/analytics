@@ -12,6 +12,7 @@ interface MetricCardProps {
   selected?: boolean;
   onToggle?: () => void;
   onClose?: () => void;
+  onCardClick?: () => void;
   accentColor?: string;
 }
 
@@ -23,10 +24,12 @@ export function MetricCard({
   selected = false,
   onToggle,
   onClose,
+  onCardClick,
   accentColor = 'var(--brand-green)'
 }: MetricCardProps) {
   return (
     <div
+      onClick={onCardClick}
       className="rounded-lg p-3 transition-all relative group"
       style={{
         background: 'var(--bg-card)',
@@ -36,6 +39,7 @@ export function MetricCard({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
+        cursor: onCardClick ? 'pointer' : 'default',
       }}
     >
       <div className="flex items-start justify-between">
@@ -43,6 +47,7 @@ export function MetricCard({
           <input
             type="checkbox"
             checked={selected}
+            onClick={(e) => e.stopPropagation()}
             onChange={onToggle}
             className="w-3 h-3 rounded cursor-pointer"
             style={{
@@ -52,8 +57,9 @@ export function MetricCard({
           <p className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
             {label}
           </p>
-          <button
-            className="p-0.5 rounded hover:opacity-70 transition-opacity"
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className="p-0.5 rounded hover:opacity-70 transition-opacity"
             style={{ color: 'var(--text-muted)' }}
             title="Metric Information"
           >
@@ -68,7 +74,10 @@ export function MetricCard({
           />
           {onClose && (
             <button
-              onClick={onClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose?.();
+              }}
               className="p-0.5 rounded hover:opacity-70 transition-opacity"
               style={{ color: 'var(--text-muted)' }}
               title="Remove Metric"

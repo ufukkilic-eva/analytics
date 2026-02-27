@@ -1,0 +1,531 @@
+# Brand Flow Analytics - Mode Matrix (Current Behavior)
+
+## Seller Mode
+
+### Table Columns
+- Product
+- Product Score
+- Price
+- Sales
+- Refund Amount
+- Quantity
+- Repeat Order Customer Count
+- Ad Spend
+- Ad Sales
+- Ad AOV
+- Clicks
+- Ad Conversions
+- Ad Units
+- Ad SKU Sales
+- Ad Sales Attributed SKU
+- ACoS
+- TACoS
+- ROAS
+- CPC
+- CTR
+- CVR
+- Page Views
+- Profit
+- Organic Sales
+- FBA Fee
+- Referral Fee
+- Total Fees
+- Margin
+- ROI
+- AOV
+- Variable Closing Fee
+- Shipping Amount
+- FBM Shipping Cost
+- Shipping to FBA Cost
+- COG
+- Unit Landing Cost
+- COGS
+- Total Expense
+- B2B Ordered Product Sales
+- Order Count
+- Repeat Order Quantity
+- Repeat Customer Rate
+- Organic Units
+- Organic Orders
+- New to Brand Order Quantity
+- New to Brand Customer Count
+- B2B Total Order Items
+- B2B Units Ordered
+- Ordered Product Sales Amount
+- Total Order Items
+- Sessions
+- Impressions
+- Child Sessions
+- B2B Page Views
+- B2B Sessions
+- ASIN Impression Count
+- Total Query Impression Count
+- Browser Sessions
+- Browser Sessions B2B
+- Mobile App Sessions
+- Mobile App Sessions B2B
+- Browser Page Views
+- Browser Page Views B2B
+- Mobile App Page Views
+- Mobile App Page Views B2B
+- Sessions B2B
+- Page Views B2B
+- Buy Box %
+- Unit Session %
+- B2B Units Per Session
+- Sales Velocity
+- Day of Supply (FBA)
+- Day of Supply (FBM)
+- ASIN Purchase Count
+- Total Purchase Count
+- Share of Voice
+- Share of Voice CP
+- Market Share
+- Market Share CP
+- Browser Session %
+- Browser Session % B2B
+- Mobile App Session %
+- Mobile App Session % B2B
+- New Order Rate
+- New Customer Rate
+- Repeat Order Rate
+- Session %
+- Session % B2B
+- Browser Page Views %
+- Mobile App Page Views %
+- Page Views %
+- Buy Box % B2B
+- Unit Session % B2B
+- Available Quantity
+- Inbound Quantity
+- FC Transfer
+- Refund Quantity
+- Refund %
+- Tag
+
+### Manage Metrics
+- Revenue:
+  - Revenue
+  - Sales
+  - Profit
+  - Ad Sales
+  - Ad AOV
+  - Organic Sales
+  - B2B Ordered Product Sales
+  - AOV
+- Advertising:
+  - Ad Spend
+  - Impressions
+  - Clicks
+  - Ad Conversions
+  - Ad Units
+  - Ad SKU Sales
+  - Ad Sales Attributed SKU
+  - ACoS
+  - TACoS
+  - ROAS
+  - CPC
+  - CTR
+  - CVR
+- Orders:
+  - Quantity
+  - Order Count
+  - Organic Units
+  - Organic Orders
+  - Repeat Order Quantity
+  - Repeat Order Customer Count
+  - New to Brand Customer Count
+  - New to Brand Order Quantity
+  - B2B Total Order Items
+  - B2B Units Ordered
+  - Ordered Product Sales Amount
+  - Total Order Items
+- Performance:
+  - Margin
+  - ROI
+  - Day of Supply (FBA)
+  - Day of Supply (FBM)
+  - Market Share
+  - Share of Voice
+  - Sales Velocity
+  - FBA Fee
+  - Referral Fee
+  - Variable Closing Fee
+  - Total Fees
+  - Unit Landing Cost
+  - COGS
+  - Total Expense
+  - Refund Amount
+  - Shipping Amount
+  - FBM Shipping Cost
+  - Shipping to FBA Cost
+  - New Order Rate
+  - New Customer Rate
+  - Repeat Order Rate
+  - Repeat Customer Rate
+  - Refund %
+  - ASIN Purchase Count
+  - Total Purchase Count
+  - Market Share CP
+  - Share of Voice CP
+  - Buy Box %
+  - Buy Box % B2B
+- Traffic:
+  - Sessions
+  - Child Sessions
+  - ASIN Impression Count
+  - Total Query Impression Count
+  - Page Views
+  - B2B Page Views
+  - B2B Sessions
+  - Browser Sessions
+  - Browser Sessions B2B
+  - Mobile App Sessions
+  - Mobile App Sessions B2B
+  - Browser Page Views
+  - Browser Page Views B2B
+  - Mobile App Page Views
+  - Mobile App Page Views B2B
+  - Browser Session %
+  - Browser Session % B2B
+  - Mobile App Session %
+  - Mobile App Session % B2B
+  - Browser Page Views %
+  - Mobile App Page Views %
+  - Session %
+  - Session % B2B
+  - Page Views %
+  - Units Per Session
+  - B2B Units Per Session
+- Other:
+  - Inbound Quantity
+  - FC Transfer
+  - Available Quantity
+  - Refund Quantity
+
+### Add Filter
+- Product Info (`multi`):
+  - Tag List
+  - Status
+  - Fulfillment Channel
+  - Inventory Status
+- Sales & Revenue (`number`):
+  - Price
+  - Sales
+  - Profit
+  - Ad SKU Sales
+  - Ad Sales Attributed SKU
+  - B2B Ordered Product Sales
+  - Organic Sales
+  - AOV
+- Orders & Units (`number`):
+  - Quantity
+  - Order Count
+  - Repeat Order Quantity
+  - New to Brand Customer Count
+  - New to Brand Order Quantity
+  - Repeat Order Customer Count
+  - B2B Total Order Items
+  - B2B Units Ordered
+  - Organic Units
+  - Organic Orders
+- Traffic & Sessions (`number`):
+  - Child Sessions
+  - ASIN Impression Count
+  - Total Query Impression Count
+  - Page Views
+  - B2B Page Views
+  - Sessions
+  - B2B Sessions
+  - Units Per Session
+  - B2B Units Per Session
+- Costs & Fees (`number`):
+  - Cost
+  - COG
+  - FBA Fee
+  - Unit Landing Cost
+  - Referral Fee
+  - COGS
+  - FBM Shipping Cost
+  - Total Expense
+  - Shipping to FBA Cost
+  - Variable Closing Fee
+  - Total Fees
+  - Shipping Amount
+  - Refund Amount
+- Performance (`number`):
+  - Day of Supply (FBA)
+  - Day of Supply (FBM)
+  - Market Share
+  - Share of Voice
+  - Sales Velocity
+  - ROI
+  - Margin
+  - New Order Rate
+  - New Customer Rate
+  - Repeat Order Rate
+  - Buy Box %
+  - Refund %
+  - ASIN Purchase Count
+  - Repeat Customer Rate
+  - Total Purchase Count
+  - Market Share CP
+  - Share of Voice CP
+- Advertising (`number`):
+  - Ad Spend
+  - Ad Sales
+  - Impressions
+  - Clicks
+  - ACoS
+  - ROAS
+  - CPC
+  - CTR
+  - CVR
+  - TACoS
+  - Ad Conversions
+  - Ad Units
+  - Ad AOV
+- Inventory (`number`):
+  - Inbound Quantity
+  - FC Transfer
+  - Available Quantity
+  - Refund Quantity
+
+### Chart Rendering
+- Bar:
+  - Impressions
+- Line:
+  - All other chart-enabled metrics
+
+---
+
+## Vendor Mode
+
+### Table Columns
+- Product
+- Price
+- Sales
+- Refund Amount
+- Quantity
+- Repeat Order Customer Count
+- Ad Spend
+- Ad Sales
+- Ad AOV
+- Clicks
+- Ad Conversions
+- Ad Units
+- Ad SKU Sales
+- Ad Sales Attributed SKU
+- ACoS
+- TACoS
+- ROAS
+- CPC
+- CTR
+- CVR
+- Page Views
+- Shipped Revenue
+- Shipped COGS
+- Open Purchase Order Units
+- PO Open Carried Over Count
+- PO Open Carried Over Units
+- PO Period Count
+- PO Period Ordered Units
+- PO Period Open Count
+- PO Period Closed Count
+- PO Period Open Units
+- PO Period Closed Units
+- Order Count
+- Repeat Order Quantity
+- Repeat Customer Rate
+- Shipped Units
+- Repeat Orders
+- Repeat Purchase Revenue
+- Sessions
+- Impressions
+- Vendor Confirmation Rate
+- Avg Vendor Lead Time (Days)
+- Procurable Out of Stock Rate
+- Sellable On Hand Inventory
+- Unsellable On Hand Inventory
+- Aged 90+ Days Units
+- Sellable On Hand Inventory Cost
+- Unsellable On Hand Inventory Cost
+- Aged 90+ Days Cost
+
+### Manage Metrics
+- Revenue:
+  - Shipped Revenue
+  - Sales
+  - Ad Sales
+  - Refund Amount
+  - Open Purchase Order Units
+  - PO Period Ordered Units
+  - PO Period Open Units
+  - PO Period Closed Units
+- Advertising:
+  - Ad Spend
+  - Ad AOV
+  - Impressions
+  - Clicks
+  - Ad Conversions
+  - Ad Units
+  - Ad SKU Sales
+  - Ad Sales Attributed SKU
+  - ACoS
+  - TACoS
+  - ROAS
+  - CPC
+  - CTR
+  - CVR
+- Orders:
+  - Order Count
+  - Shipped Units
+  - Quantity
+  - Repeat Orders
+  - Repeat Purchase Revenue
+- Traffic:
+  - Sessions
+  - Page Views
+- Performance:
+  - Vendor Confirmation Rate
+  - Avg Vendor Lead Time (Days)
+  - Procurable Out of Stock Rate
+- Other:
+  - Sellable On Hand Inventory
+  - Unsellable On Hand Inventory
+  - Aged 90+ Days Units
+
+### Add Filter
+- Product Info (`multi`):
+  - Tag List
+  - Status
+  - Inventory Status
+- Sales & Revenue (`number`):
+  - Price
+  - Sales
+  - Ad Sales
+  - Ad SKU Sales
+  - Ad Sales Attributed SKU
+  - Refund Amount
+- Orders & Units (`number`):
+  - Quantity
+  - Order Count
+  - Repeat Order Quantity
+  - Repeat Order Customer Count
+- Traffic & Sessions (`number`):
+  - Sessions
+  - Page Views
+  - Impressions
+  - Clicks
+- Performance (`number`):
+  - ACoS
+  - TACoS
+  - ROAS
+  - CPC
+  - CTR
+  - CVR
+- Advertising (`number`):
+  - Ad Spend
+  - Ad AOV
+  - Ad Conversions
+  - Ad Units
+- Inventory (`number`):
+  - Purchase Order Units
+  - Available Quantity
+
+### Chart Rendering
+- Bar:
+  - Impressions
+- Line:
+  - All other chart-enabled metrics
+
+---
+
+## Seller + Vendor (Both) Mode
+
+### Table Columns
+- Product
+- Price
+- Sales
+- Refund Amount
+- Quantity
+- Repeat Order Customer Count
+- Ad Spend
+- Ad Sales
+- Ad AOV
+- Clicks
+- Ad Conversions
+- Ad Units
+- Ad SKU Sales
+- Ad Sales Attributed SKU
+- ACoS
+- TACoS
+- ROAS
+- CPC
+- CTR
+- CVR
+- Page Views
+
+### Manage Metrics
+- Revenue:
+  - Sales
+  - Ad Sales
+  - Refund Amount
+- Advertising:
+  - Ad Spend
+  - Ad AOV
+  - Clicks
+  - Ad Conversions
+  - Ad Units
+  - Ad SKU Sales
+  - Ad Sales Attributed SKU
+  - ACoS
+  - TACoS
+  - ROAS
+  - CPC
+  - CTR
+  - CVR
+- Orders:
+  - Quantity
+  - Repeat Order Customer Count
+- Traffic:
+  - Page Views
+
+### Add Filter
+- Product Info (`multi`):
+  - Tag List
+  - Status
+  - Inventory Status
+- Sales & Revenue (`number`):
+  - Price
+  - Sales
+  - Ad Sales
+  - Ad SKU Sales
+  - Ad Sales Attributed SKU
+  - Refund Amount
+- Orders & Units (`number`):
+  - Quantity
+  - Repeat Order Customer Count
+- Traffic & Sessions (`number`):
+  - Page Views
+  - Clicks
+- Performance (`number`):
+  - ACoS
+  - TACoS
+  - ROAS
+  - CPC
+  - CTR
+  - CVR
+- Advertising (`number`):
+  - Ad Spend
+  - Ad AOV
+  - Ad Conversions
+  - Ad Units
+- Inventory (`number`):
+  - Available Quantity
+
+### Chart Rendering
+- Bar:
+  - None (no Impressions metric in both manage metrics)
+- Line:
+  - All chart-enabled metrics in the both set
