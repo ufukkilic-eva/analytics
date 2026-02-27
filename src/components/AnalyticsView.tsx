@@ -197,7 +197,6 @@ const BOTH_METRIC_DEFINITIONS: MetricDefinition[] = [
   createMetricDefinition('refund-amount', 'Refund Amount', 'Revenue', '#22c55e'),
   createMetricDefinition('ad-spend', 'Ad Spend', 'Advertising', '#10b981'),
   createMetricDefinition('ad-aov', 'Ad AOV', 'Advertising', '#10b981'),
-  createMetricDefinition('impressions', 'Impressions', 'Advertising', '#10b981', { value: '1,245,680', previousValue: '1,112,000', change: { value: '12.5%', isPositive: true }, chart: { dataKey: 'impressions', yAxisId: 'right', type: 'number', renderAs: 'bar' } }),
   createMetricDefinition('clicks', 'Clicks', 'Advertising', '#10b981', { value: '34,980', previousValue: '31,250', change: { value: '11.9%', isPositive: true }, chart: { dataKey: 'clicks', yAxisId: 'right', type: 'number' } }),
   createMetricDefinition('ad-conversions', 'Ad Conversions', 'Advertising', '#10b981'),
   createMetricDefinition('ad-units', 'Ad Units', 'Advertising', '#10b981'),
@@ -211,11 +210,9 @@ const BOTH_METRIC_DEFINITIONS: MetricDefinition[] = [
   createMetricDefinition('cvr', 'CVR', 'Advertising', '#10b981'),
 
   createMetricDefinition('quantity', 'Quantity', 'Orders', '#ec4899', { chart: { dataKey: 'order', yAxisId: 'right', type: 'number' } }),
-  createMetricDefinition('order-count', 'Order Count', 'Orders', '#ec4899', { value: '2,140', previousValue: '1,780', change: { value: '20.2%', isPositive: true }, chart: { dataKey: 'order', yAxisId: 'right', type: 'number' } }),
   createMetricDefinition('repeat-order-customer-count', 'Repeat Order Customer Count', 'Orders', '#ec4899'),
 
   createMetricDefinition('page-views', 'Page Views', 'Traffic', '#f59e0b', { chart: { dataKey: 'pageViews', yAxisId: 'right', type: 'number' } }),
-  createMetricDefinition('sessions', 'Sessions', 'Traffic', '#f59e0b', { chart: { dataKey: 'sessions', yAxisId: 'right', type: 'number' } }),
 
 ];
 
@@ -442,7 +439,7 @@ export function AnalyticsView() {
         </div>
 
         <div className="mt-4">
-          <AdvancedFilter />
+          <AdvancedFilter mode={accountType} />
         </div>
       </div>
 
