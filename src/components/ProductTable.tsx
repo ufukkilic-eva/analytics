@@ -18,6 +18,15 @@ const COLOR_PALETTE = [
 ];
 
 type StoreType = 'amazon' | 'shopify' | 'both';
+type GroupByType = 'brand' | 'tag' | 'parent-asin' | 'asin' | 'sku';
+
+type DisplayProduct = Product & {
+  __groupMeta?: {
+    key: string;
+    count: number;
+    kind: Exclude<GroupByType, 'asin' | 'sku'>;
+  };
+};
 
 interface Product {
   id: number;
@@ -142,12 +151,45 @@ interface Product {
   b2bSessions: number;
   asinImpressionCount: number;
   totalQueryImpressionCount: number;
+  browserSessions?: number;
+  browserSessionsB2b?: number;
+  mobileAppSessions?: number;
+  mobileAppSessionsB2b?: number;
+  browserPageViews?: number;
+  browserPageViewsB2b?: number;
+  mobileAppPageViews?: number;
+  mobileAppPageViewsB2b?: number;
+  sessionsB2b?: number;
+  pageViewsB2b?: number;
   // Performance
   buyBoxPercent: string;
   unitSessionPercent: string;
   b2bUnitsPerSession: string;
   salesVelocity: string;
   dayOfSupplyFba: number;
+  dayOfSupplyFbm?: number;
+  asinPurchaseCount?: number;
+  totalPurchaseCount?: number;
+  shareOfVoice?: string;
+  shareOfVoiceCp?: string;
+  marketShare?: string;
+  marketShareCp?: string;
+  browserSessionPercent?: string;
+  browserSessionPercentB2b?: string;
+  mobileAppSessionPercent?: string;
+  mobileAppSessionPercentB2b?: string;
+  newOrderRate?: string;
+  newCustomerRate?: string;
+  repeatOrderRate?: string;
+  sessionPercent?: string;
+  sessionPercentB2b?: string;
+  browserPageViewsPercent?: string;
+  mobileAppPageViewsPercent?: string;
+  pageViewsPercent?: string;
+  buyBoxPercentB2b?: string;
+  unitSessionPercentB2b?: string;
+  refundQuantity?: number;
+  refundPercent?: string;
   // Inventory
   availableQuantity: number;
   inboundQuantity: number;
@@ -547,16 +589,50 @@ const COLUMN_DEFINITIONS: ColumnDef[] = [
   { id: 'b2bSessions', label: 'B2B Sessions', category: 'Traffic', align: 'right', availableIn: ['seller'] },
   { id: 'asinImpressionCount', label: 'ASIN Impression Count', category: 'Traffic', align: 'right', availableIn: ['seller'] },
   { id: 'totalQueryImpressionCount', label: 'Total Query Impression Count', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'browserSessions', label: 'Browser Sessions', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'browserSessionsB2b', label: 'Browser Sessions B2B', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'mobileAppSessions', label: 'Mobile App Sessions', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'mobileAppSessionsB2b', label: 'Mobile App Sessions B2B', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'browserPageViews', label: 'Browser Page Views', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'browserPageViewsB2b', label: 'Browser Page Views B2B', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'mobileAppPageViews', label: 'Mobile App Page Views', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'mobileAppPageViewsB2b', label: 'Mobile App Page Views B2B', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'sessionsB2b', label: 'Sessions B2B', category: 'Traffic', align: 'right', availableIn: ['seller'] },
+  { id: 'pageViewsB2b', label: 'Page Views B2B', category: 'Traffic', align: 'right', availableIn: ['seller'] },
   // Performance Seller
   { id: 'buyBoxPercent', label: 'Buy Box %', category: 'Performance', align: 'right', availableIn: ['seller'] },
   { id: 'unitSessionPercent', label: 'Unit Session %', category: 'Performance', align: 'right', availableIn: ['seller'] },
   { id: 'b2bUnitsPerSession', label: 'B2B Units Per Session', category: 'Performance', align: 'right', availableIn: ['seller'] },
   { id: 'salesVelocity', label: 'Sales Velocity', category: 'Performance', align: 'right', availableIn: ['seller'] },
   { id: 'dayOfSupplyFba', label: 'Day of Supply (FBA)', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'dayOfSupplyFbm', label: 'Day of Supply (FBM)', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'asinPurchaseCount', label: 'ASIN Purchase Count', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'totalPurchaseCount', label: 'Total Purchase Count', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'shareOfVoice', label: 'Share of Voice', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'shareOfVoiceCp', label: 'Share of Voice CP', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'marketShare', label: 'Market Share', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'marketShareCp', label: 'Market Share CP', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'browserSessionPercent', label: 'Browser Session %', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'browserSessionPercentB2b', label: 'Browser Session % B2B', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'mobileAppSessionPercent', label: 'Mobile App Session %', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'mobileAppSessionPercentB2b', label: 'Mobile App Session % B2B', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'newOrderRate', label: 'New Order Rate', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'newCustomerRate', label: 'New Customer Rate', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'repeatOrderRate', label: 'Repeat Order Rate', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'sessionPercent', label: 'Session %', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'sessionPercentB2b', label: 'Session % B2B', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'browserPageViewsPercent', label: 'Browser Page Views %', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'mobileAppPageViewsPercent', label: 'Mobile App Page Views %', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'pageViewsPercent', label: 'Page Views %', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'buyBoxPercentB2b', label: 'Buy Box % B2B', category: 'Performance', align: 'right', availableIn: ['seller'] },
+  { id: 'unitSessionPercentB2b', label: 'Unit Session % B2B', category: 'Performance', align: 'right', availableIn: ['seller'] },
   // Inventory Seller
   { id: 'availableQuantity', label: 'Available Quantity', category: 'Other', align: 'right', availableIn: ['seller'] },
   { id: 'inboundQuantity', label: 'Inbound Quantity', category: 'Other', align: 'right', availableIn: ['seller'] },
   { id: 'fcTransfer', label: 'FC Transfer', category: 'Other', align: 'right', availableIn: ['seller'] },
+  { id: 'refundQuantity', label: 'Refund Quantity', category: 'Revenue', align: 'right', availableIn: ['seller'] },
+  { id: 'refundPercent', label: 'Refund %', category: 'Revenue', align: 'right', availableIn: ['seller'] },
+  { id: 'tag', label: 'Tag', category: 'Other', align: 'left', availableIn: ['seller'] },
 
   // VENDOR ONLY - shown when Vendor selected (NOT shown in 'both' mode)
   { id: 'shippedRevenue', label: 'Shipped Revenue', category: 'Revenue', align: 'right', defaultVisible: true, availableIn: ['vendor'] },
@@ -596,11 +672,13 @@ const COLUMN_DEFINITIONS: ColumnDef[] = [
 interface ProductTableProps {
   selectedStore?: StoreType;
   mode?: ModeType;
+  groupBy?: GroupByType;
 }
 
 export function ProductTable({
   selectedStore = 'both',
-  mode = 'seller'
+  mode = 'seller',
+  groupBy = 'brand'
 }: ProductTableProps) {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [tagDatabase, setTagDatabase] = useState(INITIAL_TAGS);
@@ -649,6 +727,11 @@ export function ProductTable({
     setActivePreset('All Columns');
   }, [mode]);
 
+  useEffect(() => {
+    setSelectedProductIds(new Set());
+    setExpandedProductIds(new Set());
+  }, [groupBy]);
+
   // Column presets configuration
   const COLUMN_PRESETS = useMemo(() => {
     const availableCols = COLUMN_DEFINITIONS.filter(col => col.availableIn.includes(mode));
@@ -696,10 +779,12 @@ export function ProductTable({
   }, [groupedColumns, columnSearch]);
 
   const handleToggleColumn = (colId: string) => {
+    if (colId === 'product') return;
     setSelectedColumnIds(prev => {
       const newSet = new Set(prev);
       if (newSet.has(colId)) newSet.delete(colId);
       else newSet.add(colId);
+      newSet.add('product');
       return newSet;
     });
     setActivePreset(null);
@@ -711,15 +796,17 @@ export function ProductTable({
   };
 
   const handleClearAll = () => {
-    // Always keep product and productScore columns
-    setSelectedColumnIds(new Set(['product', 'productScore']));
+    // Always keep product column
+    setSelectedColumnIds(new Set(['product']));
     setActivePreset(null);
   };
 
   const handleApplyPreset = (presetName: string) => {
     const preset = COLUMN_PRESETS[presetName as keyof typeof COLUMN_PRESETS];
     if (preset) {
-      setSelectedColumnIds(new Set(preset));
+      const next = new Set(preset);
+      next.add('product');
+      setSelectedColumnIds(next);
       setActivePreset(presetName);
     }
   };
@@ -1117,6 +1204,7 @@ export function ProductTable({
                           type="checkbox"
                           checked={selectedColumnIds.has(col.id)}
                           onChange={() => handleToggleColumn(col.id)}
+                          disabled={col.id === 'product'}
                           className="rounded focus:ring-0"
                           style={{ borderColor: 'var(--card-border)' }}
                         />
@@ -1160,6 +1248,7 @@ export function ProductTable({
       case 'ctr': return product.ctr;
       case 'cvr': return product.cvr;
       case 'pageViews': return product.pageViews;
+      case 'tag': return product.tags.join(', ') || '-';
       case 'profit': return product.profit;
       case 'organicSales': return product.organicSales;
       case 'fbaFee': return product.fbaFee;
@@ -1195,11 +1284,44 @@ export function ProductTable({
       case 'b2bSessions': return product.b2bSessions;
       case 'asinImpressionCount': return product.asinImpressionCount;
       case 'totalQueryImpressionCount': return product.totalQueryImpressionCount;
+      case 'browserSessions': return product.browserSessions ?? '-';
+      case 'browserSessionsB2b': return product.browserSessionsB2b ?? '-';
+      case 'mobileAppSessions': return product.mobileAppSessions ?? '-';
+      case 'mobileAppSessionsB2b': return product.mobileAppSessionsB2b ?? '-';
+      case 'browserPageViews': return product.browserPageViews ?? '-';
+      case 'browserPageViewsB2b': return product.browserPageViewsB2b ?? '-';
+      case 'mobileAppPageViews': return product.mobileAppPageViews ?? '-';
+      case 'mobileAppPageViewsB2b': return product.mobileAppPageViewsB2b ?? '-';
+      case 'sessionsB2b': return product.sessionsB2b ?? product.b2bSessions;
+      case 'pageViewsB2b': return product.pageViewsB2b ?? product.b2bPageViews;
       case 'buyBoxPercent': return product.buyBoxPercent;
       case 'unitSessionPercent': return product.unitSessionPercent;
       case 'b2bUnitsPerSession': return product.b2bUnitsPerSession;
       case 'salesVelocity': return product.salesVelocity;
       case 'dayOfSupplyFba': return product.dayOfSupplyFba;
+      case 'dayOfSupplyFbm': return product.dayOfSupplyFbm ?? '-';
+      case 'asinPurchaseCount': return product.asinPurchaseCount ?? '-';
+      case 'totalPurchaseCount': return product.totalPurchaseCount ?? '-';
+      case 'shareOfVoice': return product.shareOfVoice ?? '-';
+      case 'shareOfVoiceCp': return product.shareOfVoiceCp ?? '-';
+      case 'marketShare': return product.marketShare ?? '-';
+      case 'marketShareCp': return product.marketShareCp ?? '-';
+      case 'browserSessionPercent': return product.browserSessionPercent ?? '-';
+      case 'browserSessionPercentB2b': return product.browserSessionPercentB2b ?? '-';
+      case 'mobileAppSessionPercent': return product.mobileAppSessionPercent ?? '-';
+      case 'mobileAppSessionPercentB2b': return product.mobileAppSessionPercentB2b ?? '-';
+      case 'newOrderRate': return product.newOrderRate ?? '-';
+      case 'newCustomerRate': return product.newCustomerRate ?? '-';
+      case 'repeatOrderRate': return product.repeatOrderRate ?? '-';
+      case 'sessionPercent': return product.sessionPercent ?? '-';
+      case 'sessionPercentB2b': return product.sessionPercentB2b ?? '-';
+      case 'browserPageViewsPercent': return product.browserPageViewsPercent ?? '-';
+      case 'mobileAppPageViewsPercent': return product.mobileAppPageViewsPercent ?? '-';
+      case 'pageViewsPercent': return product.pageViewsPercent ?? '-';
+      case 'buyBoxPercentB2b': return product.buyBoxPercentB2b ?? '-';
+      case 'unitSessionPercentB2b': return product.unitSessionPercentB2b ?? '-';
+      case 'refundQuantity': return product.refundQuantity ?? '-';
+      case 'refundPercent': return product.refundPercent ?? '-';
       case 'availableQuantity': return product.availableQuantity;
       case 'inboundQuantity': return product.inboundQuantity;
       case 'fcTransfer': return product.fcTransfer;
@@ -1307,6 +1429,122 @@ export function ProductTable({
     };
   };
 
+  const AVERAGE_COLUMN_IDS = new Set<string>([
+    'price', 'acos', 'tacos', 'roas', 'cpc', 'ctr', 'cvr', 'margin', 'roi', 'aov',
+    'repeatCustomerRate', 'buyBoxPercent', 'unitSessionPercent', 'b2bUnitsPerSession',
+    'salesVelocity', 'dayOfSupplyFba', 'vendorConfirmationRate', 'averageVendorLeadTimeDays',
+    'procurableOutOfStockRate'
+  ]);
+
+  const aggregateColumnValue = (items: Product[], columnId: string): string | number | null => {
+    const rawValues = items.map(item => (item as Record<string, unknown>)[columnId] as string | number | null | undefined)
+      .filter((value): value is string | number => value !== undefined && value !== null);
+
+    if (!rawValues.length) return null;
+
+    const parsedValues = rawValues.map(parseDisplayValue);
+    const allParseable = parsedValues.every(Boolean);
+
+    if (!allParseable) {
+      return rawValues[0];
+    }
+
+    const parsed = parsedValues[0]!;
+    const numbers = parsedValues.map(p => p!.numericValue);
+    const useAverage = AVERAGE_COLUMN_IDS.has(columnId) || parsed.kind === 'percent';
+    const aggregatedNumeric = useAverage
+      ? numbers.reduce((sum, value) => sum + value, 0) / Math.max(1, numbers.length)
+      : numbers.reduce((sum, value) => sum + value, 0);
+
+    if (typeof rawValues[0] === 'number') {
+      return Number.isInteger(rawValues[0]) ? Math.round(aggregatedNumeric) : Number(aggregatedNumeric.toFixed(parsed.decimals));
+    }
+
+    return formatParsedValue(aggregatedNumeric, parsed);
+  };
+
+  const getSkuGroupKey = (product: Product) => `${product.asin}-${product.id}`;
+
+  const getGroupLabel = (product: Product, key: string) => {
+    switch (groupBy) {
+      case 'brand':
+        return `Brand: ${key}`;
+      case 'tag':
+        return `Tag: ${key}`;
+      case 'parent-asin':
+        return `Parent ASIN: ${key}`;
+      case 'asin':
+        return `ASIN: ${key}`;
+      case 'sku':
+        return `SKU: ${key}`;
+      default:
+        return key;
+    }
+  };
+
+  const displayProducts = useMemo<DisplayProduct[]>(() => {
+    if (groupBy === 'asin' || groupBy === 'sku') {
+      return products;
+    }
+
+    const getGroupKey = (product: Product) => {
+      switch (groupBy) {
+        case 'brand':
+          return product.brand || 'Unknown Brand';
+        case 'tag':
+          return product.tags[0] || 'No Tag';
+        case 'parent-asin':
+          return product.parentAsin || '-';
+        default:
+          return product.brand || 'Unknown Brand';
+      }
+    };
+
+    const grouped = new Map<string, Product[]>();
+    products.forEach(product => {
+      const key = getGroupKey(product);
+      const current = grouped.get(key);
+      if (current) current.push(product);
+      else grouped.set(key, [product]);
+    });
+
+    return Array.from(grouped.entries()).map(([key, items], index) => {
+      const base = { ...items[0] } as DisplayProduct;
+      base.id = Number(`${items[0].id}${index + 1}`);
+      base.name = `${getGroupLabel(items[0], key)} (${items.length})`;
+      base.asin = '-';
+      base.parentAsin = groupBy === 'parent-asin' ? key : '-';
+      base.brand = groupBy === 'brand' ? key : 'Grouped';
+      base.tags = groupBy === 'tag' ? [key] : [];
+      base.__groupMeta = {
+        key,
+        count: items.length,
+        kind: groupBy as Exclude<GroupByType, 'asin' | 'sku'>,
+      };
+
+      COLUMN_DEFINITIONS.forEach(column => {
+        if (column.id === 'product' || column.id === 'productScore') return;
+        const aggregated = aggregateColumnValue(items, column.id);
+        if (aggregated !== null) {
+          (base as Record<string, unknown>)[column.id] = aggregated;
+        }
+      });
+
+      return base;
+    });
+  }, [products, groupBy]);
+
+  const getProductColumnLabel = () => {
+    switch (groupBy) {
+      case 'sku': return 'SKU';
+      case 'tag': return 'Tag';
+      case 'parent-asin': return 'Parent ASIN';
+      case 'asin': return 'ASIN';
+      case 'brand': return 'Brand';
+      default: return 'Product';
+    }
+  };
+
   const renderCellWithPeriodMeta = (
     productId: number,
     columnId: string,
@@ -1383,10 +1621,10 @@ export function ProductTable({
                     type="checkbox"
                     className="rounded focus:ring-0 focus:ring-offset-0"
                     style={{ borderColor: '#4b5563', background: 'var(--bg-primary)', color: 'var(--brand-blue)' }}
-                    checked={selectedProductIds.size === products.length && products.length > 0}
+                    checked={selectedProductIds.size === displayProducts.length && displayProducts.length > 0}
                     onChange={() => {
-                      if (selectedProductIds.size === products.length) setSelectedProductIds(new Set());
-                      else setSelectedProductIds(new Set(products.map(p => p.id)));
+                      if (selectedProductIds.size === displayProducts.length) setSelectedProductIds(new Set());
+                      else setSelectedProductIds(new Set(displayProducts.map(p => p.id)));
                     }}
                   />
                 </th>
@@ -1401,15 +1639,17 @@ export function ProductTable({
                       minWidth: col.width
                     }}
                   >
-                    {col.label}
+                    {col.id === 'product' ? getProductColumnLabel() : col.label}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody style={{ borderTop: '1px solid var(--card-border)' }}>
-              {products.map((product) => {
+              {displayProducts.map((product) => {
                 const score = getScore(product);
                 const scoreColor = getScoreColor(score);
+                const groupMeta = product.__groupMeta;
+                const isDetailedRow = !groupMeta;
 
                 const isExpanded = expandedProductIds.has(product.id);
                 const salesColumnIndex = visibleColumns.findIndex((column) => column.id === 'sales');
@@ -1455,6 +1695,91 @@ export function ProductTable({
                         }}
                       >
                         {col.id === 'product' ? (
+                          !isDetailedRow ? (
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0">
+                                <img
+                                  src={product.image}
+                                  alt=""
+                                  className="w-10 h-10 rounded-md object-cover bg-white"
+                                  style={{ border: '1px solid var(--card-border)' }}
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                {groupMeta?.kind === 'tag' ? (
+                                  <>
+                                    <div className="mb-2">
+                                      <span
+                                        className="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold"
+                                        style={{
+                                          background: `${tagDatabase[groupMeta.key as keyof typeof tagDatabase] || '#64748B'}33`,
+                                          color: tagDatabase[groupMeta.key as keyof typeof tagDatabase] || '#cbd5e1'
+                                        }}
+                                      >
+                                        {groupMeta.key}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                      <button className="text-[11px] font-medium flex items-center gap-1 hover:underline" style={{ color: 'var(--brand-blue)' }}>
+                                        <ChevronRight className="w-3 h-3" />
+                                        View Products
+                                      </button>
+                                      <button className="text-[11px] font-medium flex items-center gap-1 hover:underline" style={{ color: 'var(--brand-blue)' }}>
+                                        <ChevronRight className="w-3 h-3" />
+                                        View Days
+                                      </button>
+                                    </div>
+                                  </>
+                                ) : groupMeta?.kind === 'parent-asin' ? (
+                                  <>
+                                    <div className="font-semibold text-[13px] leading-tight mb-2" style={{ color: 'var(--text-primary)' }}>
+                                      {product.name.length > 65 ? `${product.name.slice(0, 65)}...` : product.name}
+                                    </div>
+                                    <div className="text-[11px] mb-2" style={{ color: 'var(--text-muted)' }}>
+                                      Parent ASIN: {groupMeta.key} &nbsp; Brand: {product.brand}
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                      {mode !== 'vendor' && (
+                                        <button className="text-[11px] font-medium flex items-center gap-1 hover:underline" style={{ color: 'var(--brand-blue)' }}>
+                                          <ChevronRight className="w-3 h-3" />
+                                          View SKUs
+                                        </button>
+                                      )}
+                                      <button className="text-[11px] font-medium flex items-center gap-1 hover:underline" style={{ color: 'var(--brand-blue)' }}>
+                                        <ChevronRight className="w-3 h-3" />
+                                        View ASINs
+                                      </button>
+                                      <button className="text-[11px] font-medium flex items-center gap-1 hover:underline" style={{ color: 'var(--brand-blue)' }}>
+                                        <ChevronRight className="w-3 h-3" />
+                                        View Days
+                                      </button>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="mb-2">
+                                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold" style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>
+                                        {groupMeta?.key}
+                                      </span>
+                                      <span className="ml-2 text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                                        {groupMeta?.count} items
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                      <button className="text-[11px] font-medium flex items-center gap-1 hover:underline" style={{ color: 'var(--brand-blue)' }}>
+                                        <ChevronRight className="w-3 h-3" />
+                                        View ASINs
+                                      </button>
+                                      <button className="text-[11px] font-medium flex items-center gap-1 hover:underline" style={{ color: 'var(--brand-blue)' }}>
+                                        <ChevronRight className="w-3 h-3" />
+                                        View Days
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
                           <div className="flex items-start gap-4">
                             <div className="flex-shrink-0">
                               <img
@@ -1493,7 +1818,7 @@ export function ProductTable({
                                 >
                                   {product.brand}
                                 </span>
-                                {mode === 'both' ? (
+                                {mode === 'both' && (groupBy === 'asin' || groupBy === 'sku') ? (
                                   <button
                                     onClick={() => {
                                       const newSet = new Set(expandedProductIds);
@@ -1511,7 +1836,7 @@ export function ProductTable({
                                   </button>
                                 ) : (
                                   <>
-                                    {mode !== 'vendor' && (
+                                    {mode !== 'vendor' && groupBy !== 'sku' && (
                                       <button
                                         className="text-[11px] font-medium flex items-center gap-1 transition-colors hover:underline"
                                         style={{ color: 'var(--brand-blue)' }}
@@ -1532,6 +1857,7 @@ export function ProductTable({
                               </div>
                             </div>
                           </div>
+                          )
                         ) : col.id === 'productScore' ? (
                           renderCellWithPeriodMeta(
                             product.id,
@@ -1579,7 +1905,7 @@ export function ProductTable({
                     ))}
                   </tr>
                   {/* Expand Row for Both Mode - Seller vs Vendor Breakdown */}
-                  {mode === 'both' && expandedProductIds.has(product.id) && (
+                  {mode === 'both' && (groupBy === 'asin' || groupBy === 'sku') && expandedProductIds.has(product.id) && (
                     <tr
                       key={`${product.id}-expand`}
                       style={{ borderBottom: '1px solid var(--card-border)', background: 'var(--bg-secondary)' }}
